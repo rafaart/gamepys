@@ -35,6 +35,18 @@ def draw_grid():
                          brick_size, 0), (line * brick_size, height))
 
 
+class Player():
+    def __init__(self, x, y):
+        img = pygame.image.load('img/p1.png')
+        self.image = pygame.transform.scale(img, (40, 80))
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
+
+    def update(self):
+        screen.blit(self.image, self.rect)
+
+
 class World():
     def __init__(self, data):
         self.tile_list = []
@@ -94,7 +106,7 @@ world_data = [
     [1, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
 ]
 
-
+player = Player(100, height - 130)
 world = World(world_data)
 
 run = True
@@ -104,6 +116,8 @@ while run:
     screen.blit(sun_img, (100, 100))
 
     world.draw()
+
+    player.update()
 
     draw_grid()
 

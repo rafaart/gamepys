@@ -37,7 +37,7 @@ def draw_grid():
 
 class Player():
     def __init__(self, x, y):
-        img = pygame.image.load('img/p1.png')
+        img = pygame.image.load('img/player.png')
         self.image = pygame.transform.scale(img, (40, 80))
         self.rect = self.image.get_rect()
         self.rect.x = x
@@ -106,7 +106,7 @@ world_data = [
     [1, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
 ]
 
-player = Player(100, height - 130)
+player = Player(10, height - 130)
 world = World(world_data)
 
 run = True

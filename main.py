@@ -131,6 +131,26 @@ class Player():
         screen.blit(self.image, self.rect)
 
 
+class Enemy(pygame.sprite.Sprite):
+    def __init__(self, x, y):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.image.load('img/snailwalk1.png')
+        self.image = pygame.transform.scale(
+            self.image, (brick_size, brick_size))
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
+        self.move_direction = 1
+        self.move_counter = 0
+
+    def update(self):
+        self.rect.x += self.move_direction
+        self.move_counter += 1
+        if abs(self.move_counter) > brick_size:
+            self.move_direction *= -1
+            self.move_counter *= -1
+
+
 class World():
     def __init__(self, data):
         self.tile_list = []
@@ -159,6 +179,10 @@ class World():
                     img_rect.y = row_count * brick_size
                     tile = (img, img_rect)
                     self.tile_list.append(tile)
+                if tile == 3:
+                    snail = Enemy(col_count * brick_size,
+                                  row_count * brick_size)
+                    snail_group.add(snail)
                 col_count += 1
             row_count += 1
 
@@ -191,6 +215,9 @@ world_data = [
 ]
 
 player = Player(100, height - (brick_size + brick_size*2))
+
+snail_group = pygame.sprite.Group()
+
 world = World(world_data)
 
 run = True
@@ -201,6 +228,9 @@ while run:
     screen.blit(sun_img, (100, 100))
 
     world.draw()
+
+    snail_group.update()
+    snail_group.draw(screen)
 
     player.update()
 

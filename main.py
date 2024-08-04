@@ -16,9 +16,10 @@ width, height = first_resolution
 width = height*0.5
 height = height*0.5
 
-# define o tamanho dos blocos do cenário
+# define as variavéis do jogo
 brick_size = width * 0.05
 game_over = 0
+main_menu = True
 
 print("Resolução da tela atual:", width, "x", height)
 print("tamanho do brick: ", brick_size)
@@ -30,6 +31,8 @@ pygame.display.set_caption('Parkour')
 sun_img = pygame.image.load('img/sun.png')
 bg_img = pygame.image.load('img/sky.png')
 restart_img = pygame.image.load('img/restart.png')
+start_img = pygame.image.load('img/start.png')
+exit_img = pygame.image.load('img/exit.png')
 
 
 class Button():
@@ -203,8 +206,8 @@ class World():
         self.tile_list = []
 
         # load images
-        dirt_img = pygame.image.load('img/dirt.png')
-        grass_img = pygame.image.load('img/grass.png')
+        dirt_img = pygame.image.load('img/wall.png')
+        grass_img = pygame.image.load('img/ground.png')
 
         row_count = 0
         for row in data:
@@ -268,8 +271,10 @@ snail_group = pygame.sprite.Group()
 world = World(world_data)
 
 # cria os butões
-restart_button = Button(width // 2, height // 2, restart_img)
-
+restart_button = Button(width // 2 - (brick_size * 3),
+                        height // 2, restart_img)
+start_button = Button(width // 2 - (brick_size * 8), height // 2, start_img)
+exit_button = Button(width // 2 + brick_size, height // 2, exit_img)
 run = True
 while run:
 
@@ -277,19 +282,26 @@ while run:
     screen.blit(bg_img, (0, 0))
     screen.blit(sun_img, (100, 100))
 
-    world.draw()
+    if main_menu:
+        if exit_button.draw():
+            run = False
+        if start_button.draw():
+            main_menu = False
+    else:
 
-    if game_over == 0:
-        snail_group.update()
+        world.draw()
 
-    snail_group.draw(screen)
+        if game_over == 0:
+            snail_group.update()
 
-    game_over = player.update(game_over)
+        snail_group.draw(screen)
 
-    if game_over == -1:
-        if restart_button.draw():
-            player.reset(100, height - (brick_size + brick_size*2))
-            game_over = 0
+        game_over = player.update(game_over)
+
+        if game_over == -1:
+            if restart_button.draw():
+                player.reset(100, height - (brick_size + brick_size*2))
+                game_over = 0
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:

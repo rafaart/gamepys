@@ -141,7 +141,12 @@ class Player():
 
             # checkar por colisões com o inimigo
             if pygame.sprite.spritecollide(self, snail_group, False):
-                game_over = -1
+                # game_over = -1
+                pass
+
+                # checkar por colisões com a saida
+            if pygame.sprite.spritecollide(self, exit_group, False):
+                game_over = 1
 
             # atualizar posição do jogador
             self.rect.x += dx
@@ -151,6 +156,9 @@ class Player():
             self.image = self.hurt_image
             if self.rect.y > 0:
                 self.rect.y += 5
+
+        elif game_over == 1:
+            self.image = self.p1_duck
 
         # desenha o jogador na tela
         screen.blit(self.image, self.rect)
@@ -169,6 +177,9 @@ class Player():
             self.images_right.append(img_right)
             self.images_left.append(img_left)
         self.hurt_image = pygame.image.load('img/p1_hurt.png')
+        self.p1_duck = pygame.image.load('img/p1_duck.png')
+        self.p1_duck = pygame.transform.scale(
+            self.p1_duck, (brick_size*0.9, brick_size * 2))
         self.image = self.images_right[self.index]
         self.rect = self.image.get_rect()
         self.rect.x = x
@@ -199,6 +210,17 @@ class Enemy(pygame.sprite.Sprite):
         if abs(self.move_counter) > brick_size:
             self.move_direction *= -1
             self.move_counter *= -1
+
+
+class Exit(pygame.sprite.Sprite):
+    def __init__(self, x, y):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.image.load('img/door_lock.png')
+        self.image = pygame.transform.scale(
+            self.image, (brick_size, brick_size * 1.5))
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
 
 
 class World():
@@ -233,6 +255,11 @@ class World():
                     snail = Enemy(col_count * brick_size,
                                   row_count * brick_size)
                     snail_group.add(snail)
+                if tile == 8:
+                    exit = Exit(col_count * brick_size,
+                                row_count * brick_size - (brick_size // 2))
+                    exit_group.add(exit)
+
                 col_count += 1
             row_count += 1
 
@@ -267,6 +294,7 @@ world_data = [
 player = Player(100, height - (brick_size + brick_size*2))
 
 snail_group = pygame.sprite.Group()
+exit_group = pygame.sprite.Group()
 
 world = World(world_data)
 
@@ -295,10 +323,16 @@ while run:
             snail_group.update()
 
         snail_group.draw(screen)
+        exit_group.draw(screen)
 
         game_over = player.update(game_over)
 
         if game_over == -1:
+            if restart_button.draw():
+                player.reset(100, height - (brick_size + brick_size*2))
+                game_over = 0
+
+        if game_over == 1:
             if restart_button.draw():
                 player.reset(100, height - (brick_size + brick_size*2))
                 game_over = 0
